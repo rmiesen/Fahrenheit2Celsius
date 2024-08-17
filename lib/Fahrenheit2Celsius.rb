@@ -19,8 +19,8 @@ module Fahrenheit2Celsius
     
 
     public
-    def new(temperature)
-      this.temperature = temperature
+    def initialize(temperature = 0.00)
+      self.temperature = temperature
     end
 
     # returns temperature with 2 digits of precision
@@ -29,7 +29,7 @@ module Fahrenheit2Celsius
     end
 
     def temperature=(value)
-      raise ArgumentError, "#{value} is not a Float" unless value.is_a(Float)
+      raise ArgumentError, "#{value} is not a Float" unless value.is_a? Float
       @temperature = value.round(2)
       #TODO: Abstract round(2) to a new attribute: precision
     end
@@ -52,13 +52,13 @@ module Fahrenheit2Celsius
     end
 
     def to_s()
-      puts "#{temperature}#{degree_char}"
+      "#{temperature}#{degree_char}"
     end
   end
 
 
   class Kelvin < Temperature
-    def self.new()
+    def self.initialize
       @@conversions[:celsius] = ->(temperature) { temperature + 273.15 }
       @@conversions[:fahrenheit] = ->(temperature) { @@conversions[:Celsius].call(temperature) * 1.8 + 32 }
       @@degree_char = 'K'
@@ -68,7 +68,7 @@ module Fahrenheit2Celsius
 
   
   class Celsius < Temperature
-    def self.new()
+    def self.initialize
       @@conversions[:kelvin] = ->(temperature) { temperature - 273.15 }
       @@conversions[:fahrenheit] = ->(temperature) { temperature * 1.8 + 32 }
       @@degree_char += 'C'
@@ -77,7 +77,7 @@ module Fahrenheit2Celsius
 
 
   class Fahrenheit < Temperature
-    def self.new()
+    def self.initialize
       @@conversions[:celsius] = ->(temperature) { (temperature - 32) / 1.8 }
       @@conversions[:kelvin] = ->(temperature) { @@conversions[:Celsius].call(temperature) - 273.15 }
       @@degree_char += 'F'
