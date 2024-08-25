@@ -41,11 +41,23 @@ module Fahrenheit2Celsius
        temp.temperature = expected_temp_f
        temp_str = temp.to_s
        expect temp_str == expected_temp_str
-
      end
+     # Temperature.convert will be tested indirectly through the three temperature classes.
   end
 
   RSpec.describe Kelvin do
+    kelvin = Fahrenheit2Celsius::Kelvin.new 293.15
+    it "can convert to Celsius" do
+      # so Temperature.convert takes a Temperature object and returns...a float?!
+      # Is that really the best behavior? Yes, it is.
+      celsius = kelvin.convert(:celsius)
+      expect(celsius).to eq 20
+    end
 
+    # TODO: Move @@conversions class variable to child classses, rely on implementations to sort out details, avoid clobbering of shared variable.
+    it "can convert to Fahrenheit" do
+      fahrenheit = kelvin.convert(:fahrenheit)
+      expect(fahrenheit).to eq 68
+    end
   end
 end
