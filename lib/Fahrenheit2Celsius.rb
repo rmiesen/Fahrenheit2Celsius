@@ -20,11 +20,23 @@ module Fahrenheit2Celsius
     # What should be suffixed to the printed temperature. Degree unicode
     # character: "\u00B0"
     @@degree_char = "\u00B0"
+
+    # logic for setter because Ruby's too dumb to call setters from initializers
+    def set_temperature(value)
+      new_temperature = value
+      if value.is_a? Integer
+        new_temperature = value.to_f
+      end
+      raise ArgumentError, "#{new_temperature} is not a Float" unless new_temperature.is_a? Float
+      @temperature = new_temperature.round(2)
+      #TODO: Abstract round(2) to a new attribute: precision
+    end
     
 
     public
     def initialize(temperature = 0.00)
-      @temperature = temperature
+      @temperature = 0.00
+      self.set_temperature(temperature)
     end
 
     # returns temperature with 2 digits of precision
@@ -33,16 +45,14 @@ module Fahrenheit2Celsius
     end
 
     def temperature=(value)
-      raise ArgumentError, "#{value} is not a Float" unless value.is_a? Float
-      @temperature = value.round(2)
-      #TODO: Abstract round(2) to a new attribute: precision
+      self.set_temperature(value)
     end
 
     attr_reader :degree_char
 
 
-    def get_conversion(temperatureType)
-      @@conversions[self.class.name][temperatureType]
+    def get_conversion(sourceTemperature, targetTemperature)
+      @@conversions[sourceTemperature][targetTemperature]
     end
 
     # Returns the temperature converted to the desired unit, as a float
@@ -65,7 +75,7 @@ module Fahrenheit2Celsius
 
 
     def to_s()
-      "#{temperature}#{degree_char}"
+      "#{temperature}#{@@degree_char}"
     end
   end
 
@@ -73,29 +83,65 @@ module Fahrenheit2Celsius
   class Kelvin < Temperature
     # This feels...unnatural. I want to put this in a static ctor like C#. But it works...
     @@conversions[:kelvin] = { }
-    @@conversions[:kelvin][:celsius] = ->(temperature) { temperature - 273.15 }
-    @@conversions[:kelvin][:fahrenheit] = ->(temperature) { @@conversions[:kelvin][:celsius].call(temperature) * 1.8 + 32 }
-    # TODO: refactor degree char
-    @@degree_char = 'K'
+    @@conversions[:kelvin][:kelvin] = ->(temperature) { temperature }
+    @@conversions[:kelvin][:celsius] = ->(temperature) { (temperature - 273.15).round(2) }
+    @@conversions[:kelvin][:fahrenheit] = ->(temperature) { (@@conversions[:kelvin][:celsius].call(temperature) * 1.8 + 32).round(2) }
 
+
+    def temperature=(value)
+      raise RangeError, "#{value} is less than 0" if value < 0
+      super.temperature = value
+    end
     def convert(target_temperature = :kelvin)
       convert_temperature(:kelvin, target_temperature)
     end
+
+    # Not ideal, but  I'm tired of fighting Ruby's tortured OO implementation.
+    def to_s()
+      "#{temperature}K"
+    end
   end
 
-  
+
   class Celsius < Temperature
     @@conversions[:celsius] = { }
-    @@conversions[:celsius][:kelvin] = ->(temperature) { temperature + 273.15 }
-    @@conversions[:celsius][:fahrenheit] = ->(temperature) { temperature * 1.8 + 32 }
-    # @@degree_char += 'C'
+    @@conversions[:celsius][:celsius] = ->(temperature) { temperature }
+    @@conversions[:celsius][:kelvin] = ->(temperature) { (temperature + 273.15).round(2) }
+    @@conversions[:celsius][:fahrenheit] = ->(temperature) { (temperature * 1.8 + 32).round(2) }
+
+    def convert(target_temperature = :kelvin)
+      convert_temperature(:celsius, target_temperature)
+    end
+
+    def temperature=(value)
+      raise RangeError, "#{value} is less than -273.15" if value < -273.15
+      super.temperature = value
+    end
+
+    # Not ideal, but  I'm tired of fighting Ruby's tortured OO implementation.
+    def to_s()
+      "#{temperature}#{@@degree_char}C"
+    end
   end
 
 
   class Fahrenheit < Temperature
     @@conversions[:fahrenheit] = { }
-    @@conversions[:fahrenheit][:celsius] = ->(temperature) { (temperature - 32) / 1.8 }
-    @@conversions[:fahrenheit][:kelvin] = ->(temperature) { @@conversions[:fahrenheit][:celsius].call(temperature) - 273.15 }
-    # @@degree_char += 'F'
+    @@conversions[:fahrenheit][:fahrenheit] = ->(temperature) { temperature }
+    @@conversions[:fahrenheit][:celsius] = ->(temperature) { ((temperature - 32) / 1.8).round(2) }
+    @@conversions[:fahrenheit][:kelvin] = ->(temperature) { (@@conversions[:fahrenheit][:celsius].call(temperature) + 273.15).round(2) }
+
+    def convert(target_temperature = :kelvin)
+      convert_temperature(:fahrenheit, target_temperature)
+    end
+
+    def temperature=(value)
+      raise RangeError, "#{value} is less than -459.67" if value < -459.67
+      super.temperature = value
+    end
+    # Not ideal, but  I'm tired of fighting Ruby's tortured OO implementation.
+    def to_s()
+      "#{temperature}#{@@degree_char}F"
+    end
   end
 end
