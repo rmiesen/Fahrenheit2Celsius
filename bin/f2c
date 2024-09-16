@@ -17,6 +17,7 @@ include Fahrenheit2Celsius
 # -v: be verbose. Show the input temperature and output temperatures
 
 # TODO: validate cli args against other possible units of temperature you might add later
+# TODO: add explicit mention of "--" in help
 
 main do |input_temperature|
   i_temperature = case options["input-scale"]

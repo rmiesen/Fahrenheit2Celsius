@@ -4,7 +4,8 @@ require_relative '../../lib/Fahrenheit2Celsius'
 require 'spec_helper'
 
 
-#TODO: Refactor RSpecs to use before, let clauses to remove repetitive code
+# TODO: Refactor RSpecs to use before, let clauses to remove repetitive code
+# BUG: Validate temperatures as being >= absolute zero
 
 RSpec.describe Fahrenheit2Celsius do
   it "has a version number" do
