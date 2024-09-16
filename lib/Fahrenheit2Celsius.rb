@@ -23,11 +23,21 @@ module Fahrenheit2Celsius
 
     # logic for setter because Ruby's too dumb to call setters from initializers
     def set_temperature(value)
-      new_temperature = value
-      if value.is_a? Integer
-        new_temperature = value.to_f
+      new_temperature = if value.is_a? Float
+                          value
+                        elsif value.respond_to? :to_f
+                          value.to_f
+                        else
+                          raise ArgumentError, "#{new_temperature} is not convertable to a Float"
+                        end
+      # sanity check for case where new_temperature == 0.0
+      if new_temperature == 0.0
+        if (value.is_a? String) && (new_temperature.to_s != value)
+          # non-numerical strings w/o a valid leading number component always convert to 0.0, so fail out
+          raise ArgumentError, "#{value} is not convertable to a Float"
+        end
       end
-      raise ArgumentError, "#{new_temperature} is not a Float" unless new_temperature.is_a? Float
+      ###      raise ArgumentError, "#{new_temperature} is not a Float" unless new_temperature.is_a? Float
       @temperature = new_temperature.round(2)
       #TODO: Abstract round(2) to a new attribute: precision
     end

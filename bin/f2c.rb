@@ -5,9 +5,7 @@ require_relative "../lib/Fahrenheit2Celsius"
 
 include OptparsePlus::Main
 include OptparsePlus::CLILogging
-
-# TODO: Write command line program using logic tested in Fahrenheit2Celsius module
-
+include Fahrenheit2Celsius
 
 # cli options: -k, -c, -n -v <temperature>
 # -[io]f: convert to fahrenheit (silly)
@@ -19,22 +17,60 @@ include OptparsePlus::CLILogging
 # -v: be verbose. Show the input temperature and output temperatures
 
 # TODO: validate cli args against other possible units of temperature you might add later
-# TODO: What about variable input and output temperature units?
 
-main do
-  puts options["input-scale"]
-  puts options["output-scale"]
+main do |input_temperature|
+  i_temperature = case options["input-scale"]
+  when :fahrenheit
+    Fahrenheit.new input_temperature
+  when :celsius
+    Celsius.new input_temperature
+  when :kelvin
+    Kelvin.new input_temperature
+  else
+    raise ArgumentError "Don't know how to process the #{options["input-scale"]} input"
+                  end
 
-  pp options
+  converted_temp = i_temperature.convert options["output-scale"]
+
+  # rubocop:disable Style/UnlessElse
+  result = unless options[:no_units]
+    o_temperature = case options["output-scale"]
+                    when :fahrenheit
+                      Fahrenheit.new converted_temp
+                    when :celsius
+                      Celsius.new converted_temp
+                    when :kelvin
+                      Kelvin.new converted_temp
+                    else
+                      raise ArgumentError "Don't know how to process the #{options["output-scale"]} output"
+
+                    end
+    o_temperature
+  else
+    converted_temp
+  end
+  # rubocop:enable Style/UnlessElse
+  if options[:verbose]
+    input = options[:no_units] ? input_temperature.to_f : i_temperature
+    result = <<~END
+    Input:  #{input}
+    Output: #{result}
+    END
+  end
+
+  puts result
+  #TODO: When outputting the temperature, run in rescue block, catch the Encoding::UndefinedConversionError exception. If it happens, strip the degree symbol from the output and try again.
 end
 
-arg :input_temperature, :required, :one
+arg :input_temperature, :required, :one,
+    "A temperature with up to two decimal places of precision that is to be converted (additional digits beyond the second will be ignored)"
 
 options["input-scale"] = :fahrenheit
 options["output-scale"] = :celsius
 scale_regex = /^(?:[fkc]|(?:fahrenheit|celsius|kelvin))$/i
 scales = %w{ f[ahrenheit] c[elsius] k[elvin] }
-on("-i", "--input-scale=VALUE", "Temperature scale used for input. Supported temperature scales: #{scales.join(" ")}", scale_regex) do |value|
+on("-i", "--input-scale=VALUE",
+   "Temperature scale used for input. Supported temperature scales: #{scales.join(" ")}", scale_regex) do |value|
 
   case value
   when /^f|fahrenheit$/i
@@ -48,7 +84,8 @@ on("-i", "--input-scale=VALUE", "Temperature scale used for input. Supported tem
   end
 end
 
-on("-o", "--output-scale=VALUE", "Temperature scale used for output. Supported temperature scales: #{scales.join(" ")}", scale_regex) do |value|
+on("-o", "--output-scale=VALUE",
+   "Temperature scale used for output. Supported temperature scales: #{scales.join(" ")}", scale_regex) do |value|
   case value
   when /^f|fahrenheit$/i
     options["output-scale"] = :fahrenheit
@@ -61,8 +98,9 @@ on("-o", "--output-scale=VALUE", "Temperature scale used for output. Supported t
   end
 end
 
-on("-n", "--no-units", "Strip the unit designators, only output temperatures")
-on("-v", "--verbose", "Be verbose")
+on("-n", "--no-units", "Strip the unit designators, only output temperatures") { options[:no_units] = true }
+
+on("-v", "--verbose", "Be verbose") { options[:verbose] = true }
 
 
 go!

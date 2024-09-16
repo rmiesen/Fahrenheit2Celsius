@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require_relative '../../lib/Fahrenheit2Celsius'
+require 'spec_helper'
 
 
+#TODO: Refactor RSpecs to use before, let clauses to remove repetitive code
 
 RSpec.describe Fahrenheit2Celsius do
   it "has a version number" do
@@ -11,6 +13,7 @@ RSpec.describe Fahrenheit2Celsius do
 end
 
 module Fahrenheit2Celsius
+  #BUG: Add new tests to all classes to check forced conversion of int to float
   RSpec.describe Temperature do
      it "can new itself with a temperatures" do
        temp_f = 123.456
@@ -44,6 +47,31 @@ module Fahrenheit2Celsius
        temp_str = temp.to_s
 
        expect(temp_str).to eq expected_temp_str
+     end
+
+     it "will not permit the creation of non-numerical temperatures" do
+       bad_temp = "dog"
+       bad_temp_caught = false
+       begin
+         temp = Temperature.new bad_temp
+       rescue ArgumentError => e
+         bad_temp = bad_temp_caught = true
+       end
+
+       expect(bad_temp_caught).to be true
+     end
+
+     it "will still permit the creation of temperatures of 0.0" do
+       good_temp = "0.0"
+       good_temp_caught = false
+       begin
+         temp = Temperature.new good_temp
+       rescue ArgumentError => e
+         good_temp = good_temp_caught = true
+       end
+
+       expect(good_temp_caught).to be false
+
      end
      # Temperature.convert will be tested indirectly through the three temperature classes.
   end
