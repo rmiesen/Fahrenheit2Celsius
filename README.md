@@ -20,9 +20,22 @@ Or install it yourself as:
 
 ## Usage
 
-To run F2C, simply pass a temperature to F2C via the command-line (fahrenheit is the default input temperature): `f2c 68`. This will output `20.0°C`. To convert between Celsius and Kelvin, run `f2c -ic -ok 20`. This will output `293.15K`.
+To run F2C, simply pass a temperature to F2C via the command-line (fahrenheit is the default input temperature):
 
-A full list of the command line options can be found by running `f2c --help`
+    $ f2c 68
+
+This will output `20.0°C`.
+
+To convert between Celsius and Kelvin, run:
+
+    $ f2c -ic -ok 20
+
+This will output `293.15K`.
+
+A full list of the command line options can be found by running:
+
+    $ f2c --help
+
 
 ## Development
 
