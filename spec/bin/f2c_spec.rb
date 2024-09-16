@@ -17,7 +17,7 @@ require_relative '../../lib/Fahrenheit2Celsius'
 #   - Set the encoding of the "output stream" to ASCII, check for output sans the degree symbol
 
 RSpec.describe "F2C's CLI interface", :type => :aruba do
-  let(:f2c) { "f2c.rb" }
+  let(:f2c) { "f2c" }
   let(:degree_char) { "\u00B0" }
   let(:f_room_temp) { 68 }
 

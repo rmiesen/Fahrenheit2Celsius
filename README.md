@@ -1,8 +1,6 @@
 # Fahrenheit2Celsius
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/Fahrenheit2Celsius`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Welcome to Fahrenheit2Celsius, or F2C for short. This program converts a single fahrenheit temperature to celsius, or optionally kelvin. It can also convert celsius and kelvin to any of the above three temperatures interchangeably. 
 
 ## Installation
 
@@ -22,7 +20,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To run F2C, simply pass a temperature to F2C via the command-line (fahrenheit is the default input temperature): `f2c 68`. This will output `20.0°C`. To convert between Celsius and Kelvin, run `f2c -ic -ok 20`. This will output `293.15K`.
+
+A full list of the command line options can be found by running `f2c --help`
 
 ## Development
 
@@ -32,8 +32,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/Fahrenheit2Celsius.
+Bug reports and pull requests are welcome on GitHub at https://github.com/rmiesen/Fahrenheit2Celsius.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [EPL 2.0 License](https://opensource.org/license/epl-2-0).
+****
